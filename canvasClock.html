@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<meta charset="UTF-8">
+<head>
+	<title>这是用canvas画的一个时钟</title>
+</head>
+<body>
+	<canvas id="clock" width="500" height="500">
+		您的浏览器不支持canvas画布，该升级浏览器了
+	</canvas>
+    <script type="text/javascript">
+    var $clock = document.getElementById('clock');
+    // 绘制2d的绘图环境
+    var ctx = $clock.getContext('2d');
+
+    function drawClock() {
+        // canvas做动画需要清除画布，否则上一次画的东西会重复出现在画布上
+        ctx.clearRect(0, 0, 500, 500);
+
+        var now = new Date();
+        var sec = now.getSeconds();
+        var min = now.getMinutes();
+        var hour = now.getHours();
+
+        // 小时需要获取浮点数，eg:10:10
+        hour = hour + min/60;
+        hour = hour > 12 ? hour - 12 : hour;
+
+        // 绘制表盘
+        ctx.lineWidth = 10;
+        ctx.strokeStyle = "#000";
+        ctx.beginPath();
+        ctx.arc(250, 250, 200, 0, 360, false);
+        ctx.closePath();
+        ctx.stroke();
+
+        // 刻度
+        // 时刻度
+        for (var i = 0; i < 12; i++) {
+            ctx.save();
+
+            ctx.lineWidth = 7;
+            ctx.strokeStyle = '#000';
+
+            // 进行旋转
+            ctx.translate(250, 250);
+            ctx.rotate(30 * i * Math.PI / 180);
+            ctx.beginPath();
+            // 以旋转空间的中心为基础定坐标
+            ctx.moveTo(0, -170);
+            ctx.lineTo(0, -190);
+            ctx.stroke();
+            ctx.closePath();
+            ctx.restore();
+        }
+
+        // 分刻度
+        for (var i = 0; i < 60; i++) {
+            ctx.save();
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = '#000';
+            ctx.translate(250, 250);
+            ctx.rotate(6 * i * Math.PI / 180);
+            ctx.beginPath();
+
+            ctx.moveTo(0, -180);
+            ctx.lineTo(0, -190);
+            ctx.stroke();
+            ctx.closePath();
+            ctx.restore();
+        }
+
+        // 时针（时针在最底部，先画时针）
+        ctx.save();
+
+        ctx.lineWidth = 7;
+        ctx.strokeStyle = '#000';
+        ctx.translate(250, 250);
+        ctx.rotate(hour * 30 * Math.PI / 180);
+        ctx.beginPath();
+        ctx.moveTo(0, -150);
+        ctx.lineTo(0, 10);
+        ctx.closePath();
+        ctx.stroke();
+        ctx.restore();
+
+        // 分针
+        ctx.save();
+        ctx.lineWidth = 5;
+        ctx.strokeStyle = '#000';
+        ctx.translate(250, 250);
+
+        ctx.rotate(min * 6 * Math.PI / 180);
+        ctx.beginPath();
+        ctx.moveTo(0, -160);
+        ctx.lineTo(0, 15);
+        ctx.closePath();
+        ctx.stroke();
+        ctx.restore();
+
+        // 秒针，秒针还需要画圈圈
+        ctx.save();
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = '#F00';
+
+        ctx.translate(250, 250);
+        ctx.rotate(sec * 6 * Math.PI / 180);
+        ctx.beginPath();
+        ctx.moveTo(0, -170);
+        ctx.lineTo(0, 20);
+        ctx.closePath();
+        ctx.stroke();
+
+        // 表盘圆心
+        ctx.beginPath();
+        ctx.arc(0, 0, 5, 0, 360, false);
+        ctx.closePath();
+        // 设置填充样式
+        ctx.fillStyle = '#000';
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.restore();
+    }
+    // 让时钟动起来
+    drawClock();
+    setInterval(drawClock, 1000);
+    </script>
+</body>
+</html>
